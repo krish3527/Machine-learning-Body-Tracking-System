@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Live Camera Training | ApexMotion{% endblock %}
+
+{% block content %}
+<div class="training-layout">
+  
+  <!-- LEFT: Large Camera Area with Skeleton Overlay and HUD -->
+  <div class="camera-stage">
+    <div class="camera-container" id="camera-container">
+      
+      <!-- Video Element -->
+      <video id="camera-video" playsinline muted autoplay></video>
+      
+      <!-- Skeleton Drawing Canvas -->
+      <canvas id="overlay-canvas"></canvas>
+      
+      <!-- Hidden Offscreen Canvas for Frame Capture -->
+      <canvas id="capture-canvas" style="display: none;"></canvas>
+
+      <!-- Placeholder before camera starts -->
+      <div class="camera-placeholder" id="camera-placeholder">
+        <span class="placeholder-icon">&#128249;</span>
+        <p class="placeholder-text">Camera Standby</p>
+        <p class="placeholder-sub">Click "Start Workout" to activate real-time body tracking</p>
+      </div>
+
+      <!-- Top HUD Overlay -->
+      <div class="live-hud-top" id="live-hud-top" style="display: none;">
+        <div class="hud-pill" id="hud-exercise-pill">EXERCISE: SQUAT</div>
+        <div class="hud-pill status-good" id="hud-form-pill">GOOD FORM</div>
+      </div>
+
+      <!-- Animated Posture Correction Suggestion Overlay -->
+      <div class="correction-overlay" id="correction-overlay">
+        <div class="correction-card" id="correction-card">
+          <span class="correction-arrow" id="correction-arrow">&darr;</span>
+          <span class="correction-text" id="correction-text">Move hips lower &darr;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: Coaching Panel -->
+  <div class="coaching-panel">
+    
+    <div class="panel-header">
+      <h2 class="panel-title">Real-Time Coach</h2>
+    </div>
+
+    <!-- Exercise Selector -->
+    <div class="control-group">
+      <label class="control-label" for="exercise-select">Exercise</label>
+      <select id="exercise-select" class="select-control">
+        <option value="squat" selected>Squat</option>
+        <option value="pushup">Push-up</option>
+        <option value="auto">Auto-Detect (ML)</option>
+      </select>
+    </div>
+
+    <!-- Repetitions Display -->
+    <div class="stat-box">
+      <div class="stat-label">Repetitions</div>
+      <div class="stat-value-huge" id="rep-display">0</div>
+      <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;">
+        <span id="good-reps-count">0</span> Good &bull; <span id="bad-reps-count">0</span> Needs Form
+      </div>
+    </div>
+
+    <!-- Form Status Display -->
+    <div class="stat-box">
+      <div class="stat-label">Form Status</div>
+      <div class="form-pill-display good" id="form-display">GOOD FORM</div>
+    </div>
+
+    <!-- Coaching Feedback Suggestions -->
+    <div class="feedback-box">
+      <div class="feedback-title">Coaching Cues</div>
+      <ul class="feedback-list" id="feedback-list">
+        <li class="feedback-item">
+          <span class="feedback-bullet">&bull;</span>
+          <span>Position yourself so your full body is in frame.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Voice Coach Toggle -->
+    <div class="toggle-wrapper">
+      <span class="toggle-label-text">Voice Coach</span>
+      <label class="switch">
+        <input type="checkbox" id="voice-toggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Controls -->
+    <div class="btn-group">
+      <button class="btn btn-primary" id="btn-toggle-camera">Start Workout</button>
+      <button class="btn btn-secondary" id="btn-reset" disabled>Reset Counter</button>
+      <button class="btn btn-secondary" id="btn-finish" disabled>Save Workout & Finish</button>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/live_tracker.js') }}"></script>
+{% endblock %}

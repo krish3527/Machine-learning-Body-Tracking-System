@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}ApexMotion | AI Personal Training & Coaching{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Clean ApexMotion Brand Emblem -->
+<div class="home-hero">
+  <div class="hero-logo-container">
+    <div class="hero-logo-badge" title="ApexMotion Logo">
+      <img src="{{ url_for('static', filename='images/apexmotion_logo.png') }}" alt="ApexMotion Logo" class="hero-logo-img">
+    </div>
+  </div>
+  <h1 class="home-title">
+    {% if current_user %}
+      Welcome back, {{ current_user.name }}
+    {% else %}
+      ApexMotion
+    {% endif %}
+  </h1>
+  <p class="home-subtitle">Your personal AI fitness and posture coach.</p>
+</div>
+
+<!-- Three Primary Modalities -->
+<div class="home-grid">
+  <!-- Option 1: Live Training -->
+  <a href="/live" class="option-card">
+    <div>
+      <span class="card-badge">Real-Time Camera</span>
+      <h2 class="card-title">LIVE TRAINING</h2>
+      <p class="card-description">
+        Use your laptop or mobile camera for real-time body tracking, repetition counting, form feedback, and audio voice coaching.
+      </p>
+    </div>
+    <div class="card-action">
+      <span>Start Camera Training</span> &rarr;
+    </div>
+  </a>
+
+  <!-- Option 2: Video Analysis -->
+  <a href="/video" class="option-card">
+    <div>
+      <span class="card-badge">Recorded Footage</span>
+      <h2 class="card-title">VIDEO ANALYSIS</h2>
+      <p class="card-description">
+        Upload a workout video (MP4, MOV, WebM) or test built-in sample clips to analyze reps, movement mechanics, and training adjustments.
+      </p>
+    </div>
+    <div class="card-action">
+      <span>Analyze Workout Video</span> &rarr;
+    </div>
+  </a>
+
+  <!-- Option 3: Yoga Trainer -->
+  <a href="/yoga" class="option-card">
+    <div>
+      <span class="card-badge">Posture & Holds</span>
+      <h2 class="card-title">YOGA TRAINER</h2>
+      <p class="card-description">
+        Select a target yoga posture (Tadasana, Tree Pose, Warrior II, Downward Dog) and receive live angle alignment cues and hold timer tracking.
+      </p>
+    </div>
+    <div class="card-action">
+      <span>Open Yoga Studio</span> &rarr;
+    </div>
+  </a>
+</div>
+
+<!-- Dashboard Section: Today's Workout History & Workout Plan Generator -->
+<div class="dashboard-grid">
+  
+  <!-- LEFT: Today's Exercise Table -->
+  <div class="dash-panel">
+    <div class="dash-panel-header">
+      <div>
+        <h2 class="dash-panel-title">Today's Workout Log</h2>
+        <p style="font-size: 0.82rem; color: var(--text-light);">Private workout history for {{ current_user.name if current_user else 'you' }}</p>
+      </div>
+      <button type="button" class="btn btn-secondary" id="btn-clear-history" style="padding: 4px 10px; font-size: 0.75rem;">
+        Clear Log
+      </button>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="dash-metrics-bar">
+      <div class="dash-metric-card">
+        <div class="dash-metric-label">Total Exercises</div>
+        <div class="dash-metric-val" id="dash-total-exercises">0</div>
+      </div>
+      <div class="dash-metric-card">
+        <div class="dash-metric-label">Total Reps</div>
+        <div class="dash-metric-val" id="dash-total-reps">0</div>
+      </div>
+      <div class="dash-metric-card">
+        <div class="dash-metric-label">Total Duration</div>
+        <div class="dash-metric-val" id="dash-total-duration">00:00</div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>Reps</th>
+            <th>Form Quality</th>
+            <th>Duration</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="history-table-body">
+          <!-- Populated dynamically by history_manager.js -->
+        </tbody>
+      </table>
+      <div id="history-empty-state" style="display: none; text-align: center; padding: 2rem; color: var(--text-light); font-size: 0.9rem;">
+        No workout recorded today yet. Start a Live Training or Video Analysis session above!
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Random Exercise Plan Generator -->
+  <div class="dash-panel">
+    <div class="dash-panel-header">
+      <div>
+        <h2 class="dash-panel-title">Workout Plan Generator</h2>
+        <p style="font-size: 0.82rem; color: var(--text-light);">Dynamic, balanced routines tailored for smart coaching</p>
+      </div>
+      <span class="plan-tag" id="plan-difficulty">Balanced</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+      <span>Est. Duration: <strong id="plan-est-time">18 minutes</strong></span>
+      <button type="button" class="btn btn-primary" id="btn-generate-plan" style="padding: 6px 12px; font-size: 0.82rem;">
+        &#8635; Regenerate Plan
+      </button>
+    </div>
+
+    <!-- Exercise Cards Container -->
+    <div id="workout-plan-container">
+      <!-- Populated dynamically by workout_plan.js -->
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/workout_plan.js') }}"></script>
+{% endblock %}

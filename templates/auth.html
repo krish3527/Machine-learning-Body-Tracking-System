@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In | ApexMotion{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  
+  <div class="auth-card">
+    
+    <!-- ApexMotion Brand Emblem -->
+    <div class="auth-header">
+      <div class="hero-logo-badge" style="width: 72px; height: 72px; margin: 0 auto 1rem auto; padding: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.08);">
+        <img src="{{ url_for('static', filename='images/apexmotion_logo.png') }}" alt="ApexMotion Logo" class="hero-logo-img">
+      </div>
+      <h1 class="auth-title">Welcome to ApexMotion</h1>
+      <p class="auth-subtitle">Your personal AI fitness and posture coach.</p>
+    </div>
+
+    <!-- Alert Box for Errors & Feedback -->
+    <div id="auth-alert" class="auth-alert" style="display: none;"></div>
+
+    <!-- Two-Tab Selector: Login | Register -->
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab-btn active" id="tab-btn-login" data-target="login">
+        Login
+      </button>
+      <button type="button" class="auth-tab-btn" id="tab-btn-register" data-target="register">
+        Register
+      </button>
+    </div>
+
+    <!-- TAB 1: LOGIN FORM -->
+    <form id="form-login" class="auth-form-panel">
+      <div class="auth-field-group">
+        <label class="control-label" for="login-email">Email Address</label>
+        <input 
+          type="email" 
+          id="login-email" 
+          name="email" 
+          class="auth-input-control" 
+          placeholder="e.g. athlete@example.com" 
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="auth-field-group">
+        <label class="control-label" for="login-password">Password</label>
+        <input 
+          type="password" 
+          id="login-password" 
+          name="password" 
+          class="auth-input-control" 
+          placeholder="Enter your password" 
+          required 
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit-btn" id="btn-login-submit">
+        Login &rarr;
+      </button>
+
+      <div class="auth-switch-prompt">
+        <span>Don't have an account?</span>
+        <button type="button" class="auth-switch-link" id="link-goto-register">Register</button>
+      </div>
+
+      <!-- Quick Demo Login Helpers for Hackathon Evaluation -->
+      <div class="demo-accounts-box">
+        <div class="demo-accounts-label">Demo Test Accounts:</div>
+        <div class="demo-accounts-btns">
+          <button type="button" class="btn-demo-fill" data-email="test1@example.com" data-pass="test1234">
+            User A (test1@example.com)
+          </button>
+          <button type="button" class="btn-demo-fill" data-email="test2@example.com" data-pass="test1234">
+            User B (test2@example.com)
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- TAB 2: REGISTER FORM -->
+    <form id="form-register" class="auth-form-panel" style="display: none;">
+      <div class="auth-field-group">
+        <label class="control-label" for="register-name">Full Name</label>
+        <input 
+          type="text" 
+          id="register-name" 
+          name="name" 
+          class="auth-input-control" 
+          placeholder="e.g. Krish" 
+          required 
+          autocomplete="name"
+        >
+      </div>
+
+      <div class="auth-field-group">
+        <label class="control-label" for="register-email">Email Address</label>
+        <input 
+          type="email" 
+          id="register-email" 
+          name="email" 
+          class="auth-input-control" 
+          placeholder="e.g. krish@example.com" 
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="auth-field-group">
+        <label class="control-label" for="register-password">Password</label>
+        <input 
+          type="password" 
+          id="register-password" 
+          name="password" 
+          class="auth-input-control" 
+          placeholder="At least 4 characters" 
+          required 
+          autocomplete="new-password"
+        >
+      </div>
+
+      <div class="auth-field-group">
+        <label class="control-label" for="register-confirm-password">Confirm Password</label>
+        <input 
+          type="password" 
+          id="register-confirm-password" 
+          name="confirm_password" 
+          class="auth-input-control" 
+          placeholder="Re-enter your password" 
+          required 
+          autocomplete="new-password"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit-btn" id="btn-register-submit">
+        Create Account &rarr;
+      </button>
+
+      <div class="auth-switch-prompt">
+        <span>Already have an account?</span>
+        <button type="button" class="auth-switch-link" id="link-goto-login">Login</button>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

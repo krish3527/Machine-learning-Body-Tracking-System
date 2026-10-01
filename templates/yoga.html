@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Yoga Trainer | ApexMotion{% endblock %}
+
+{% block content %}
+<div class="yoga-section">
+
+  <!-- Target Pose Selector & Guide Card -->
+  <div class="yoga-guide-card">
+    <div class="yoga-guide-info">
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.25rem;">
+        <h3 id="target-pose-title">Tadasana (Mountain Pose)</h3>
+        <span class="card-badge" id="target-pose-badge">Balance & Posture</span>
+      </div>
+      <p id="target-pose-desc">
+        Standing tall with upright spine, arms relaxed alongside or extended, chest open, weight evenly balanced.
+      </p>
+    </div>
+    
+    <div style="min-width: 200px;">
+      <label class="control-label" for="yoga-pose-select">Select Target Pose</label>
+      <select id="yoga-pose-select" class="select-control">
+        <option value="tadasana" selected>Tadasana (Mountain Pose)</option>
+        <option value="tree">Tree Pose (Vrikshasana)</option>
+        <option value="warrior2">Warrior II (Virabhadrasana II)</option>
+        <option value="downward_dog">Downward Dog (Adho Mukha)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Live Yoga Training Layout -->
+  <div class="training-layout">
+    
+    <!-- LEFT: Large Live Camera Feed -->
+    <div class="camera-stage">
+      <div class="camera-container" id="camera-container">
+        <video id="camera-video" playsinline muted autoplay></video>
+        <canvas id="overlay-canvas"></canvas>
+        <canvas id="capture-canvas" style="display: none;"></canvas>
+
+        <div class="camera-placeholder" id="camera-placeholder">
+          <span class="placeholder-icon">&#129496;</span>
+          <p class="placeholder-text">Yoga Studio Standby</p>
+          <p class="placeholder-sub">Click "Begin Practice" to start real-time posture alignment</p>
+        </div>
+
+        <div class="live-hud-top" id="live-hud-top" style="display: none;">
+          <div class="hud-pill" id="hud-pose-pill">TADASANA</div>
+          <div class="hud-pill status-good" id="hud-yoga-status">ALIGNMENT READY</div>
+        </div>
+
+        <!-- Animated Posture Correction Widget -->
+        <div class="correction-overlay" id="correction-overlay">
+          <div class="correction-card" id="correction-card">
+            <span class="correction-arrow" id="correction-arrow">&uarr;</span>
+            <span class="correction-text" id="correction-text">Lengthen spine &uarr;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Yoga Coaching Panel -->
+    <div class="coaching-panel">
+      
+      <div class="panel-header">
+        <h2 class="panel-title">Posture Guidance</h2>
+      </div>
+
+      <!-- Target Hold Selector -->
+      <div class="control-group">
+        <label class="control-label" for="target-hold-select">Target Hold Duration</label>
+        <select id="target-hold-select" class="select-control">
+          <option value="5">5 Seconds (Warmup)</option>
+          <option value="10" selected>10 Seconds (Standard)</option>
+          <option value="15">15 Seconds (Endurance)</option>
+          <option value="30">30 Seconds (Mastery)</option>
+        </select>
+      </div>
+
+      <!-- Real-time Hold Timer -->
+      <div class="stat-box">
+        <div class="stat-label">Hold Duration</div>
+        <div class="stat-value-huge" id="hold-timer-display">0.0<span style="font-size: 1.25rem;">s</span></div>
+        <div class="hold-progress-bar">
+          <div class="hold-progress-fill" id="hold-progress-fill"></div>
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 6px;">
+          Best Hold: <span id="best-hold-display">0.0s</span>
+        </div>
+      </div>
+
+      <!-- Posture Alignment Status -->
+      <div class="stat-box">
+        <div class="stat-label">Posture Status</div>
+        <div class="form-pill-display good" id="yoga-status-display">ALIGNMENT READY</div>
+      </div>
+
+      <!-- Real-time Actionable Feedback -->
+      <div class="feedback-box">
+        <div class="feedback-title">Alignment Feedback</div>
+        <ul class="feedback-list" id="yoga-feedback-list">
+          <li class="feedback-item">
+            <span class="feedback-bullet">&bull;</span>
+            <span>Step into camera view and assume the target posture.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Voice Coach Toggle -->
+      <div class="toggle-wrapper">
+        <span class="toggle-label-text">Voice Coach</span>
+        <label class="switch">
+          <input type="checkbox" id="voice-toggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Controls -->
+      <div class="btn-group">
+        <button class="btn btn-primary" id="btn-toggle-camera">Begin Practice</button>
+        <button class="btn btn-secondary" id="btn-reset-hold">Reset Timer</button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/yoga_tracker.js') }}"></script>
+{% endblock %}

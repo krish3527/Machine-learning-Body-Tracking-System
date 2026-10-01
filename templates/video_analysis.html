@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %}Video Analysis & Posture Correction | ApexMotion{% endblock %}
+
+{% block content %}
+<div class="video-analysis-section">
+  
+  <div class="home-hero" style="margin-bottom: 1.5rem;">
+    <h1 class="home-title" style="font-size: 2.1rem;">Workout Video Analysis</h1>
+    <p class="home-subtitle">Upload pre-recorded exercise footage for posture diagnostics, repetition tracking, and animated skeletal corrections.</p>
+  </div>
+
+  <!-- Upload & Sample Selection Card -->
+  <div class="upload-card">
+    
+    <form id="upload-form" enctype="multipart/form-data">
+      
+      <!-- Drag & Drop Zone -->
+      <div class="dropzone" id="dropzone">
+        <span style="font-size: 2.25rem; display: block; margin-bottom: 0.5rem;">&#128228;</span>
+        <p style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 0.25rem;">
+          Choose a workout video or drag it here
+        </p>
+        <p style="font-size: 0.82rem; color: var(--text-light);">
+          Supports MP4, MOV, or WebM (Max 200MB)
+        </p>
+        <input type="file" id="video-file-input" name="video_file" accept=".mp4,.mov,.webm" style="display: none;">
+        <div id="selected-file-name" style="margin-top: 0.75rem; font-weight: 700; color: var(--accent-turquoise); font-size: 0.88rem; display: none;"></div>
+      </div>
+
+      <!-- Quick Sample Video Selector -->
+      <div class="sample-selector-box">
+        <label class="control-label" for="sample-select">Or Test Repository Sample Video</label>
+        <div style="display: flex; gap: 0.65rem; margin-top: 0.4rem;">
+          <select id="sample-select" class="select-control" style="flex: 1;">
+            <option value="" selected>-- Select a built-in demo video --</option>
+            {% for sample in sample_videos %}
+              <option value="{{ sample.filename }}">{{ sample.label }} ({{ sample.filename }})</option>
+            {% endfor %}
+          </select>
+          <button type="button" class="btn btn-secondary" id="btn-load-sample" style="white-space: nowrap; padding: 0.6rem 1rem;">
+            Load Demo
+          </button>
+        </div>
+      </div>
+
+      <!-- Exercise Mode Selection -->
+      <div style="margin-top: 1.25rem; text-align: left;">
+        <label class="control-label" for="video-exercise-mode">Exercise Classification Mode</label>
+        <select id="video-exercise-mode" name="exercise_type" class="select-control" style="margin-top: 0.35rem;">
+          <option value="auto" selected>Auto-Detect via Random Forest Classifier</option>
+          <option value="squat">Squat</option>
+          <option value="pushup">Push-up</option>
+          <option value="yoga">Yoga</option>
+        </select>
+      </div>
+
+      <!-- Submit Action Button -->
+      <div style="margin-top: 1.25rem;">
+        <button type="submit" class="btn btn-primary" id="btn-submit-analysis" style="width: 100%; padding: 0.85rem;">
+          Start Video Analysis
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Loading State Indicator -->
+    <div id="processing-indicator" style="display: none; margin-top: 1.5rem;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <div class="spinner"></div>
+        <p style="font-weight: 700; color: var(--text-main);" id="processing-status-text">Analyzing movement with MediaPipe Pose & Random Forest...</p>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-light);">
+        Evaluating joint angles, tracking reps, and diagnosing biomechanical alignment...
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Dedicated Results & Correction Section -->
+  <div class="results-container" id="results-container">
+    
+    <!-- Top Result Banner -->
+    <div style="border-bottom: 1px solid var(--border-light); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main);">Video Analysis & Form Correction</h2>
+        <p style="font-size: 0.85rem; color: var(--text-light);" id="result-filename-label">Analyzed Video</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <span class="form-pill-display good" id="result-overall-form-badge">GOOD FORM</span>
+        <button type="button" class="btn btn-secondary" id="btn-log-to-history" style="padding: 6px 12px; font-size: 0.8rem;">
+          + Add to Today's Log
+        </button>
+      </div>
+    </div>
+
+    <!-- Metric Strip -->
+    <div class="metric-strip">
+      <div class="metric-card">
+        <div class="metric-card-label">Exercise Detected</div>
+        <div class="metric-card-value" id="res-exercise-detected">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Total Repetitions</div>
+        <div class="metric-card-value" id="res-total-reps">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Good Form Reps</div>
+        <div class="metric-card-value" style="color: var(--status-good);" id="res-good-reps">0</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-card-label">Needs Correction</div>
+        <div class="metric-card-value" style="color: var(--status-warn);" id="res-bad-reps">0</div>
+      </div>
+    </div>
+
+    <!-- Two-Column Layout: Left Video Player, Right Form Analysis & Animated Correction -->
+    <div class="results-split-grid">
+      
+      <!-- LEFT: Video Player -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+          <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main);">Uploaded Workout Video</h3>
+          <span style="font-size: 0.8rem; color: var(--text-light);" id="res-video-duration-label">Duration: 00:00</span>
+        </div>
+        
+        <div style="background-color: #0b0f19; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); position: relative; aspect-ratio: 16/9; max-height: 400px; display: flex; align-items: center; justify-content: center;">
+          <video id="result-video-player" controls playsinline style="width: 100%; height: 100%; object-fit: contain;"></video>
+        </div>
+
+        <!-- Detected Form Flaws List -->
+        <div class="feedback-box" style="margin-top: 1.25rem;">
+          <div class="feedback-title">Form Issues Identified</div>
+          <ul class="feedback-list" id="res-issues-list">
+            <li class="feedback-item"><span>Analyzing posture flaws...</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RIGHT: Form Correction & Animated Human Structure -->
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        
+        <!-- Posture Correction Explanation Panel -->
+        <div class="dash-panel" style="border-top: 4px solid var(--accent-turquoise);">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+              <span class="card-badge" style="margin-bottom: 0.2rem;">Biomechanical Feedback</span>
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);">Demo Correction / Animated Form Guide</h3>
+            </div>
+            <button type="button" class="btn btn-secondary" id="btn-play-voice-cue" style="padding: 4px 10px; font-size: 0.78rem;">
+              &#128266; Voice Cue
+            </button>
+          </div>
+
+          <!-- 1. What is Wrong -->
+          <div style="margin-bottom: 1rem;">
+            <div class="control-label" style="color: var(--status-warn); margin-bottom: 0.2rem;">1. Detected Issue (What is Wrong)</div>
+            <p id="correction-what-is-wrong" style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); line-height: 1.4;">
+              Your torso is leaning too far forward during the squat.
+            </p>
+          </div>
+
+          <!-- 2. Animated Human Correction Demonstration -->
+          <div style="margin-bottom: 1rem;">
+            <div class="control-label" style="margin-bottom: 0.35rem;">2. Animated Human Movement Demo (User Form &rarr; Correct Form)</div>
+            <div id="animated-skeleton-mount">
+              <!-- Reusable animated skeleton rendered by animated_skeleton.js -->
+            </div>
+          </div>
+
+          <!-- 3. How to Correct It -->
+          <div style="margin-bottom: 1rem;">
+            <div class="control-label" style="color: var(--accent-green); margin-bottom: 0.2rem;">3. How to Correct It</div>
+            <p id="correction-how-to-correct" style="font-size: 0.92rem; font-weight: 600; color: var(--text-main); line-height: 1.4;">
+              Keep your chest more upright and maintain a neutral back while lowering.
+            </p>
+          </div>
+
+          <!-- 4. Why It Matters -->
+          <div style="margin-bottom: 0.5rem;">
+            <div class="control-label" style="margin-bottom: 0.2rem;">4. Why It Matters</div>
+            <p id="correction-why-it-matters" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+              Poor movement alignment can place unnecessary stress on joints and muscles. Better spinal alignment helps maintain controlled movement.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Training Adjustment Suggestions -->
+        <div class="dash-panel">
+          <div class="feedback-title" style="margin-bottom: 0.5rem;">Suggested Training Adjustments</div>
+          <div id="res-adjustments-container">
+            <div class="advice-card">
+              Technique guidance will appear based on detected performance.
+            </div>
+          </div>
+          <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
+            <strong>Suggested Next Workout:</strong> <span id="res-next-workout-text">Try controlled squats with slower movement.</span>
+          </div>
+          <p class="disclaimer-text">
+            * General fitness training suggestions based on kinematic movement metrics. Not medical advice.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/animated_skeleton.js') }}"></script>
+<script src="{{ url_for('static', filename='js/video_analysis.js') }}"></script>
+{% endblock %}
