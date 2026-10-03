@@ -2,10 +2,6 @@
 
 Real-time action classification (squat / pushup / standing) using joint angle geometry and a Random Forest classifier — no deep learning required for the classification layer.
 
-## Demo
-
-![Demo](demo/demo.gif)
-
 ## Architecture
 
 ```
